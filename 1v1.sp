@@ -9,36 +9,24 @@
 
 #pragma newdecls required
 
+// shit no one cares about
 #define TAG "\x01[\x0Eawyx 1v1\x01]"
-
 public Plugin myinfo = 
 {
-	name = "1v1 plugin [Mostly for Surf Combat]",
+	name = "1v1 plugin",
 	author = "awyx",
-	description = "Choose 2 players and fight!",
-	version = "1.2",
+	description = "Choose 2 players and fight! ",
+	version = "1.3",
 	url = "https://steamcommunity.com/id/sleepiest/"
 };
 
 
-int player1;
-int player2;
-
-
-int roundsWon_p1 = 0;
-int roundsWon_p2 = 0;
-
-int p1, p2;
-
-int rounds;
-
-bool match;
-bool draw;
-
-bool playerkilled;
-bool hpRule;
-
+// global vars
+int player1, player2, p1, p2, rounds;
+int roundsWon_p1 = 0, roundsWon_p2 = 0;
+bool match, draw, playerkilled, hpRule;
 bool beingUsed = false; // menu being used by another player
+
 
 public void OnPluginStart()
 {
@@ -50,7 +38,6 @@ public void OnPluginStart()
 	HookEvent("round_end", OnRoundEnd);
 }
 
-
 // current map
 char mapname[128];
 public void OnMapStart() 
@@ -58,7 +45,6 @@ public void OnMapStart()
     GetCurrentMap(mapname, sizeof(mapname));
 }
 
-// round start
 public void OnRoundStart(Handle event, const char[] name, bool dontBroadcast) 
 { 
 	if (match){
@@ -102,23 +88,19 @@ public void OnRoundEnd(Handle event, const char[] name, bool dontBroadcast)
 					PrintToChatAll("\%s \x03---------- GG ----------", TAG);
 					
 					if (roundsWon_p1 == rounds){ // p1 wins
-						for (int x = 0; x < 3; x++){
+						for (int x = 0; x < 3; x++) {
 							PrintToChatAll("%s \x0B%N \x01has beaten \x07%N \x01( \x0B%d \x01- \x07%d\x01 ) ", TAG, p1, p2, roundsWon_p1, roundsWon_p2);
 						}
 					}
 					
 					if (roundsWon_p2 == rounds){ // p2 wins
-						for (int y = 0; y < 3; y++){ 
+						for (int y = 0; y < 3; y++) { 
 							PrintToChatAll("%s \x07%N \x01has beaten \x0B%N \x01( \x07%d \x01- \x0B%d\x01 ) ", TAG, p2, p1, roundsWon_p2, roundsWon_p1);
 						}
 					}
-					player1 = -1;
-					player2 = -1;
-					roundsWon_p1 = 0;
-					roundsWon_p2 = 0;
-					p1 = -1;
-					p2 = -1;
-					rounds = 0;
+					
+					p1 = p2 = player1 = player2 = -1;
+					rounds = roundsWon_p1 = roundsWon_p2 = 0;
 					match = false;
 				}	
 			}
@@ -133,17 +115,13 @@ public void Event_PlayerDeath(Event event, const char[] name, bool dontBroadcast
 		int client = GetClientOfUserId(event.GetInt("userid"));
 		int victimId = event.GetInt("userid");
 		int victim = GetClientOfUserId(victimId);
-	
 		int teamVictim = GetClientTeam(victim);
 
 		if (teamVictim == CS_TEAM_T) 
-		{
 			roundsWon_p1++;
-		}
+
 		else if (teamVictim == CS_TEAM_CT)
-		{
 			roundsWon_p2++;
-		}
 		
 		playerkilled = true;
 		
@@ -166,13 +144,9 @@ public void Event_PlayerDeath(Event event, const char[] name, bool dontBroadcast
 				}
 				ShowHudText(client, 2, "%N has won!", p2);
 			}
-			player1 = -1;
-			player2 = -1;
-			roundsWon_p1 = 0;
-			roundsWon_p2 = 0;
-			p1 = -1;
-			p2 = -1;
-			rounds = 0;
+			
+			p1 = p2 = player1 = player2 = -1;
+			rounds = roundsWon_p1 = roundsWon_p2 = 0;
 			match = false;
 		}
 	}
@@ -182,18 +156,13 @@ public void Event_PlayerDeath(Event event, const char[] name, bool dontBroadcast
 public Action Cancel1v1(int client, int args)
 {
 	PrintToChat(client, "%s \x07Match canceled!", TAG);
-	player1 = -1;
-	player2 = -1;
-	roundsWon_p1 = 0;
-	roundsWon_p2 = 0;
-	p1 = -1;
-	p2 = -1;
-	rounds = 0;
-	match = false;
-	playerkilled = false;
-	draw = false;
-	beingUsed = false;
+	
+	p1 = p2 = player1 = player2 = -1;
+	rounds = roundsWon_p1 = roundsWon_p2 = 0;
+	match = playerkilled = draw = beingUsed = false;
+	
 	RemoveCommandListener(ChangeTeam, "jointeam");
+	
 	return Plugin_Stop; 
 }
 
@@ -210,7 +179,9 @@ public Action Main(int client, int args)
 		PrintToChat(client, "%s \x07There is someone using the plugin already.", TAG);
 		return Plugin_Stop;
 	}
+	
 	PrintToChat(client, "%s \x07If you want to cancel the 1v1 match do \x04!cancel1v1", TAG);
+	
 	beingUsed = true;
 	Menu menu = new Menu(MenuMain_Callback);
 	menu.SetTitle("First to ? rounds");
@@ -229,20 +200,10 @@ public int MenuMain_Callback(Menu menu, MenuAction action, int param1, int param
 		{
 			char item[32];
 			menu.GetItem(param2, item, sizeof(item));
-			
-			if (StrEqual(item, "1")){
-				rounds = 1;
-				hpRuleMenu(param1);
-			}
-			if (StrEqual(item, "2")){
-				rounds = 3;
-				hpRuleMenu(param1);
-			}
-			if (StrEqual(item, "3")){
-				rounds = 5;
-				hpRuleMenu(param1);
-			}
+			rounds = StringToInt(item) * 2 - 1;
+			hpRuleMenu(param1);
 		}
+		
 		case MenuAction_End: { Cancel1v1(param1,param2); delete menu; }
 	}
 }
@@ -268,15 +229,15 @@ public int MenuHP_Callback(Menu menu, MenuAction action, int param1, int param2)
 			char item[32];
 			menu.GetItem(param2, item, sizeof(item));
 			
-			if (StrEqual(item, "0")){
+			if (StrEqual(item, "0"))
 				hpRule = false;
-				menu1(param1);
-			}
-			if (StrEqual(item, "1")){
+
+			if (StrEqual(item, "1"))
 				hpRule = true;
-				menu1(param1);
-			}
+				
+			menu1(param1);
 		}
+		
 		case MenuAction_End: { Cancel1v1(param1,param2); delete menu; } 
 	}
 }
@@ -318,6 +279,7 @@ public int MenuT1_Cb(Menu menuT1, MenuAction action, int param1, int param2)
 			}
 			menu2(param1);
 		}
+		
 		case MenuAction_End:{ Cancel1v1(param1,param2); delete menuT1; }
 	}
 }
@@ -343,9 +305,10 @@ public Action menu2(int client)
 					break;
 				}
      		}
-     		if(!verificarid){
+     		
+     		if(!verificarid)
 				menuT2.AddItem(info, name);
-			}
+
     	}
  	}
  	menuT2.Display(client, 0);
@@ -369,6 +332,7 @@ public int MenuT2_Cb(Menu menuT2, MenuAction action, int param1, int param2)
 			}
 			SpecOut();
 		}
+		
 		case MenuAction_End:{ Cancel1v1(param1,param2); delete menuT2; }		
 	}	
 }
@@ -378,6 +342,7 @@ void SpecOut()
 {
 	beingUsed = false;
 	match = true;
+	
 	if (match)
 	{
 		commands();
@@ -385,9 +350,7 @@ void SpecOut()
 		for (int i = 1; i <= MaxClients; i++)
 		{
 			if(IsClientInGame(i) && i != player1 && i != player2)
-			{
 				ChangeClientTeam(i, CS_TEAM_SPECTATOR);
-			}
 		}
 	}
 }
@@ -395,8 +358,7 @@ void SpecOut()
 // chat stuff (players, score and current map)
 public void info1v1()
 {
-	if (match)
-	{
+	if (match) {
 		PrintToChatAll("\x01 \x04******************************");
 		PrintToChatAll("\x01 \x0B%N \x01vs \x07%N", p1, p2); 
 		PrintToChatAll("\x01 Score: %d - %d (first to \x05%d\x01)", roundsWon_p1, roundsWon_p2, rounds); 
@@ -415,7 +377,7 @@ public Action ChangeTeam(int client, const char[] command, int args)
 // sum shit idk restart n stuff
 void commands()
 {
-	if (match){
+	if (match) {
 		ServerCommand("mp_restartgame 1");
 		ServerCommand("mp_limitteams 0");
 		ServerCommand("mp_autoteambalance 0");
@@ -424,12 +386,7 @@ void commands()
 
 public Action end()
 {
-	player1 = -1;
-	player2 = -1;
-	roundsWon_p1 = 0;
-	roundsWon_p2 = 0;
-	p1 = -1;
-	p2 = -1;
-	rounds = 0;
+	p1 = p2 = player1 = player2 = -1;
+	rounds = roundsWon_p1 = roundsWon_p2 = 0;
 	match = false;
 }
