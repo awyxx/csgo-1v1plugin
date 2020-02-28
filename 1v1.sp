@@ -4,7 +4,7 @@
 #include <sdktools>
 #include <sdkhooks>
 #include <cstrike>
-#include <colors>  
+//#include <colors>  
 #include <halflife>
 
 #pragma newdecls required
