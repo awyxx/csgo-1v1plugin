@@ -1,5 +1,5 @@
 # CSGO-1v1plugin
-## Simple 1vs1 plugin with menus + more
+## Simple 1vs1 plugin with menus
 
 **I did this mostly for Combat Surf, but it should work (good) with other game mods ^^**
 
