@@ -46,13 +46,10 @@ Handle g_menuPlayer2;
 
 public void OnPluginStart()
 {
-	//RegAdminCmd("sm_1v1", 		OnCommand_1v1, 		 ADMFLAG_GENERIC);
-	//RegAdminCmd("sm_random1v1", OnCommand_Random1v1, ADMFLAG_GENERIC);
-	//RegAdminCmd("sm_cancel1v1", OnCommand_Cancel1v1, ADMFLAG_GENERIC);
+	RegAdminCmd("sm_1v1", 		OnCommand_1v1, 		 ADMFLAG_GENERIC);
+	RegAdminCmd("sm_random1v1", OnCommand_Random1v1, ADMFLAG_GENERIC);
+	RegAdminCmd("sm_cancel1v1", OnCommand_Cancel1v1, ADMFLAG_GENERIC);
 	
-	RegConsoleCmd("sm_1v1", OnCommand_1v1);
-	RegConsoleCmd("sm_1v1", OnCommand_Random1v1);
-	RegConsoleCmd("sm_cancel1v1", OnCommand_Cancel1v1);
 	
 	HookEvent("round_start", 		Event_OnRoundStart);
 	HookEvent("player_death", 		Event_PlayerDeath);	
